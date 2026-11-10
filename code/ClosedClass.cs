@@ -1,3 +1,4 @@
+#!/usr/bin/env dotnet
 #:property LangVersion=preview
 
 using static System.Console;
