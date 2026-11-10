@@ -11,9 +11,7 @@ foreach (var arg in args)
     });
 }
 
-
 //or maybe data
-
 List<Trips> trips = [
     new Trip(10, DateTimeOffset.Now),
     new RTTrip("20", DateTimeOffset.Now)
