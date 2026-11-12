@@ -52,6 +52,12 @@ dotnet run UnionTypes.cs
 | [scripts/weekinfo](code/filebased/scripts/weekinfo) | **Skript utan `.cs`-ändelse** med shebang (`#!/usr/bin/env -S dotnet --`). Kan symlänkas in på `PATH` och köras som ett vanligt kommando. Visar också metadata på direktiv (`#:package Humanizer.Core@2.* PrivateAssets=all`) och floating versions. |
 | [commands.sh](code/filebased/commands.sh) | **CLI-sidan**: C# från stdin (`echo '...' \| dotnet run -`), byggcachen (0,9 s första körningen, 0,05 s med cache), `dotnet format`, `dotnet package list --outdated/--vulnerable` och `dotnet reference list` på file-based apps. |
 
+### .NET MAUI
+
+| Mapp | Visar |
+|---|---|
+| [maui/](code/maui/) | **`dotnet run` för MAUI och DevFlow**: appen byggs, installeras och startas på en Android-emulator med `dotnet run -f net11.0-android --device emulator-5554`, utan IDE. Med DevFlow-agenten (bara Debug) och MCP-servern `maui-devflow` kan en AI-agent läsa det visuella trädet, trycka på knappen via `AutomationId` och verifiera texten. Alla steg, även Linux-uppsättning och felsökning, finns i [DEMO.md](code/maui/DEMO.md). |
+
 ### AI / MCP
 
 | Mapp | Visar |

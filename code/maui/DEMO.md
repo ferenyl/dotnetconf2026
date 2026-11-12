@@ -162,12 +162,22 @@ adb forward tcp:<port> tcp:<port>    # porten från listan
 maui devflow diagnose                # broker, agent och projekt ska vara OK
 ```
 
-Kontrollera manuellt att det fungerar:
+**Om `wait` får timeout och `list` är tom:** i mitt test startade agenten på standardporten 9223 men registrerade sig aldrig hos brokern. Det syns i loggen `adb logcat -d -s DOTNET:I`, där det står `Agent started on port 9223`.
+
+Anslut då direkt i stället:
 
 ```sh
-maui devflow ui tree --depth 3
-maui devflow ui tap --automationId CounterBtn
-maui devflow ui assert --automationId CounterBtn Text "Clicked 1 time"
+adb forward tcp:9223 tcp:9223
+maui devflow agent status -ap 9223 -p android   # visar appnamn, pid och route om det fungerar
+```
+
+Kontrollera manuellt att det fungerar (`-p android` behövs, standard är maccatalyst):
+
+```sh
+maui devflow ui query --automationId CounterBtn --fields id,type,text,automationId -ap 9223 -p android
+maui devflow ui tap CounterBtn -ap 9223 -p android
+maui devflow ui assert --automationId CounterBtn Text "Clicked 1 time" -ap 9223 -p android
+maui devflow ui screenshot --output shot.png -ap 9223 -p android
 ```
 
 ### C5. Be agenten testa appen
