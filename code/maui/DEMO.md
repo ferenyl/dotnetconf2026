@@ -190,6 +190,49 @@ Agenten använder då DevFlow-verktygen via MCP: läser det visuella trädet, tr
 
 Det här är bättre än bara skärmdumpar, eftersom agenten får det riktiga trädet. Det ger tydligare resultat och kostar färre tokens.
 
+### C6. Visa appen i DevFlow Inspector (valfritt)
+
+Inspector visar skärmdump, visuellt träd, properties och diagnostik för den körande appen. Den har också ett Interact-läge där man klickar i förhandsvisningen. Den ingår i `maui` CLI och hostas av brokern. Källa: [docs/DevFlow/inspector.md](https://github.com/dotnet/maui-labs/blob/main/docs/DevFlow/inspector.md) i `dotnet/maui-labs`.
+
+**Ordningen är viktig: brokern måste köra innan appen startar.**
+
+```sh
+# 1. Brokern först. Den stänger sig själv efter ~8 min utan agenter,
+#    så starta den precis före demon.
+maui devflow broker start
+maui devflow broker status          # "running": true
+
+# 2. I en egen terminal: förbered Android-forwarding och vänta på agenten.
+#    Låt den köra medan appen startar.
+maui devflow wait --wait-platform Android --device emulator-5554
+
+# 3. I en annan terminal: starta appen (Debug)
+cd code/maui
+dotnet run -f net11.0-android --device emulator-5554
+
+# 4. Kontrollera att appen har registrerat sig hos brokern
+maui devflow list                   # ska visa maui / Android / port
+```
+
+Öppna sedan **<http://localhost:19223/inspector/>** i webbläsaren och välj appen.
+
+Andra värdar för samma Inspector:
+
+| Värd | Så öppnar du den |
+|---|---|
+| Webbläsare | `http://localhost:19223/inspector/` (enklast, ingår i CLI:t) |
+| VS Code | Kommandot **MAUI DevFlow: Open Inspector**. VSIX:en måste byggas från källkod (`src/DevFlow/js/vscode-inspector` i maui-labs). |
+| Copilot app / CLI | Be Copilot öppna "MAUI DevFlow Inspector canvas" |
+
+**Känt problem i min miljö (Linux, Android 36, CLI `0.1.0-preview.14`):** agenten startade i fallback-läge på port 9223 och registrerade sig aldrig hos brokern. Inget registreringsförsök syns i `maui devflow broker log`. Då förblir Inspector tom, även fast sidan laddar.
+
+Testa därför i förväg att `maui devflow list` visar appen. Om listan är tom: hoppa över Inspector och visa trädet i terminalen i stället (det fungerar via direktanslutning):
+
+```sh
+adb forward tcp:9223 tcp:9223
+maui devflow ui tree --depth 4 --fields id,type,text,automationId -ap 9223 -p android
+```
+
 ---
 
 ## Felsökning
@@ -200,6 +243,8 @@ Det här är bättre än bara skärmdumpar, eftersom agenten får det riktiga tr
 | CLI:t når inte agenten | Kontrollera att `adb forward tcp:<port> tcp:<port>` använder porten från `maui devflow list`. |
 | `No Android devices found` | Emulatorn har inte bootat klart. Kör `adb devices`. |
 | MCP-verktygen syns inte i Claude | Kör `/mcp` i Claude Code och kontrollera att `maui-devflow` är godkänd. |
-| Loggar från agenten | `adb logcat -s MauiDevFlow` |
+| Loggar från agenten | `adb logcat -d -s DOTNET:I` och leta efter `[Microsoft.Maui.DevFlow]` |
+| `broker status` visar `"running": false` | Brokern stänger sig själv efter ~8 min utan agenter. Kör `maui devflow broker start` igen. |
+| Inspector-sidan laddar men visar ingen app | Appen har inte registrerat sig hos brokern. Se C6 och använd `ui tree` med direktanslutning som reserv. |
 
 Port-forwardingen gäller per emulatorsession. Starta om emulatorn, så måste C2 och `adb forward` i C4 göras igen.

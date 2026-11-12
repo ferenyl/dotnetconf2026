@@ -1,5 +1,13 @@
 ﻿<ContentPage x:Class="maui.MainPage">
 
+    <!--
+        .NET 11: note that there are no xmlns declarations on this page.
+        XAML namespaces are mapped globally in MAUI 11, so every file gets smaller.
+
+        The button is what the AI agent taps in the demo (see DEMO.md):
+        AutomationId="CounterBtn" gives it a stable name, so DevFlow can find it
+        without relying on its text, coordinates or position in the tree.
+    -->
     <ScrollView>
         <VerticalStackLayout
             Padding="30,0"

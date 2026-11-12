@@ -1,5 +1,30 @@
 # MCP Server
 
+## Om demon
+
+En remote MCP-server (Streamable HTTP) byggd med MCP C# SDK och `dotnet new mcpserver`. Poängen är **elicitation**: i stället för att modellen gissar parametrar frågar toolet *användaren*.
+
+| Tool | Gör |
+|---|---|
+| `GetRandomNumber` ([RandomNumberTools.cs](Tools/RandomNumberTools.cs)) | Frågar efter min och max och returnerar ett slumptal. |
+| `PlaceTripOrder` ([TripOrderTools.cs](Tools/TripOrderTools.cs)) | Tar resenärens id som argument, frågar sedan efter från, till och avgångstid och lägger en fejkad beställning. |
+
+Båda använder det nya MRTR-flödet (protokoll 2026-07-28). Servern returnerar ett "input required"-svar och klienten skickar om anropet med svaren, så det behövs inga sticky sessions. För äldre klienter finns en fallback till klassisk `ElicitAsync`.
+
+### Köra demon
+
+```sh
+cd code/mcp
+dotnet run                                  # lyssnar på http://localhost:5000/mcp
+```
+
+Testa på något av följande sätt:
+
+- **MCP Inspector:** `npx @modelcontextprotocol/inspector`, anslut med Streamable HTTP till `http://localhost:5000/mcp` och anropa ett tool.
+- **Claude Code:** starta `claude` i den här mappen. [.mcp.json](.mcp.json) registrerar servern som `random`. Prompta till exempel *"Ge mig ett slumptal"* eller *"Beställ en resa åt resenär 42"* och svara på frågorna som dyker upp.
+
+Resten av den här filen kommer från mallen `dotnet new mcpserver`.
+
 This README was created using the C# MCP server project template.
 It demonstrates how you can easily create an MCP server using C# and publish it as a NuGet package.
 

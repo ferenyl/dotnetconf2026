@@ -1,3 +1,10 @@
+// MAUI demo: `dotnet run` from the terminal + an AI agent tapping a button via DevFlow.
+// The full step-by-step guide (Linux setup, emulator, broker, troubleshooting) is in DEMO.md.
+//
+// Run: dotnet run -f net11.0-android --device emulator-5554
+//
+// The only DevFlow-specific code in the app is the agent registration below
+// and the AutomationId on the button in MainPage.xaml.
 using Microsoft.Extensions.Logging;
 #if DEBUG
 using Microsoft.Maui.DevFlow.Agent;
