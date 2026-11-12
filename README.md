@@ -41,6 +41,17 @@ dotnet run UnionTypes.cs
 | [RuntimeAsync.cs](code/RuntimeAsync.cs) | **Runtime async** (preview): samma kod med compiler async (state machines) och med runtime async. Mäter tid, allokeringar per anrop och exceptions. Kör en gång, avkommentera `#:property Features=runtime-async=on` och kör igen. Kör med `-c Release`. |
 | [PostQuantum.cs](code/PostQuantum.cs) | **Post-quantum-kryptering**: ML-KEM med Encapsulate/Decapsulate, sedan HKDF och AES-GCM. Visar också Composite ML-KEM (ML-KEM + X25519) och HPKE med single shot, flera meddelanden och manipulerade meddelanden. Kräver OpenSSL 3.5+ på Linux. |
 
+### File-based apps i .NET 11 ([code/filebased/](code/filebased/))
+
+| Fil | Visar |
+|---|---|
+| [include/app.cs](code/filebased/include/app.cs) | **`#:include`**: delar upp appen i flera filer. Includes är transitiva: `app.cs` → `Models/Trip.cs` → `Formatting.cs`. Inkluderade filer kan lägga till typer men inga top-level statements. |
+| [ref/app.cs](code/filebased/ref/app.cs) | **`#:ref`**: refererar en annan file-based app, i det här fallet biblioteket [lib/greeter.cs](code/filebased/ref/lib/greeter.cs) med `OutputType=Library` och ett eget NuGet-paket. Biblioteket byggs som en egen assembly, som en `ProjectReference`. |
+| [project/app.cs](code/filebased/project/app.cs) | **`#:project`**: refererar en vanlig `.csproj` ([SharedLib](code/filebased/project/SharedLib/)). Appen ligger bredvid projektmappen, inte i den. |
+| [web/web.cs](code/filebased/web/web.cs) | **`#:sdk Microsoft.NET.Sdk.Web`**: ett helt web-API i en fil. [web.settings.json](code/filebased/web/web.settings.json) läses in automatiskt som appsettings och [web.run.json](code/filebased/web/web.run.json) fungerar som launchSettings (port 5050). |
+| [scripts/weekinfo](code/filebased/scripts/weekinfo) | **Skript utan `.cs`-ändelse** med shebang (`#!/usr/bin/env -S dotnet --`). Kan symlänkas in på `PATH` och köras som ett vanligt kommando. Visar också metadata på direktiv (`#:package Humanizer.Core@2.* PrivateAssets=all`) och floating versions. |
+| [commands.sh](code/filebased/commands.sh) | **CLI-sidan**: C# från stdin (`echo '...' \| dotnet run -`), byggcachen (0,9 s första körningen, 0,05 s med cache), `dotnet format`, `dotnet package list --outdated/--vulnerable` och `dotnet reference list` på file-based apps. |
+
 ### AI / MCP
 
 | Mapp | Visar |
@@ -52,4 +63,6 @@ dotnet run UnionTypes.cs
 - **Runtime async**: `-p:Features=...` på kommandoraden fungerar inte för file-based apps. Använd `#:property`-direktivet.
 - **Unsafe v2**: sliden visade `<MemorySafetyRulesVersion>`, men den egenskapen finns inte än. I preview slås det på med `Features=updated-memory-safety-rules`.
 - **HPKE med ML-KEM** stöds inte på Linux/OpenSSL i mina tester. Demon faller då tillbaka på klassisk X25519. Vanlig ML-KEM och Composite ML-KEM fungerar.
+- **CA2266**: .NET 11 varnar om en file-based app inte börjar med `#!`, så alla entry points har en shebang.
+- **Mappnamnet `bin/`** ignoreras av standard-`.gitignore`, så skript ligger i `scripts/`.
 - `CompositeMLKem` och `Hpke` är `[Experimental]` (`SYSLIB5006`/`SYSLIB5009`) i .NET 11.

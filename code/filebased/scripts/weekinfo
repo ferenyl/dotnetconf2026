@@ -1,0 +1,27 @@
+#!/usr/bin/env -S dotnet --
+// A C# script that runs like any other command: no .cs extension needed.
+//
+// The shebang makes the OS run it with dotnet. `--` stops dotnet from eating
+// arguments like --help that are meant for the script.
+//
+// Install on PATH:
+//   chmod +x weekinfo
+//   ln -s "$PWD/weekinfo" ~/.local/bin/weekinfo
+//   weekinfo 2026-12-24
+//
+// The first run builds (~1 s), after that the cached build starts in ~100 ms.
+#:package Humanizer.Core@2.* PrivateAssets=all
+// ^ .NET 11: metadata on directives (PrivateAssets=all), plus a floating version (2.*)
+
+using System.Globalization;
+using Humanizer;
+
+var date = args.Length > 0
+    ? DateOnly.Parse(args[0], CultureInfo.InvariantCulture)
+    : DateOnly.FromDateTime(DateTime.Today);
+
+int week = ISOWeek.GetWeekOfYear(date.ToDateTime(TimeOnly.MinValue));
+int daysAway = date.DayNumber - DateOnly.FromDateTime(DateTime.Today).DayNumber;
+
+Console.WriteLine($"{date:yyyy-MM-dd} is a {date.DayOfWeek}, ISO week {week}");
+Console.WriteLine(daysAway == 0 ? "That's today" : TimeSpan.FromDays(daysAway).Humanize() + (daysAway > 0 ? " from now" : " ago"));

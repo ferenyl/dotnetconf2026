@@ -1,0 +1,9 @@
+{
+  "Greeting": "Hej från web.settings.json!",
+  "Stops": [ "Hem", "Skola", "Fritids" ],
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information"
+    }
+  }
+}
